@@ -178,7 +178,7 @@ void launchTest(void) {
     
     // Open the Audio File
     NSLog(@"Starting ...\n");
-    NSURL *filePath = [[NSBundle mainBundle] URLForResource:@"LongTrack" withExtension:@"flac"];
+    NSURL *filePath = [[NSBundle mainBundle] URLForResource:@"LongTrack2" withExtension:@"flac"];
     const char* fileURL = [filePath.path cStringUsingEncoding:NSUTF8StringEncoding];
     PlaybackCallbackData playbackCallbackData = {0};
     playbackCallbackData.rawFile = fopen(fileURL, "r");
@@ -207,7 +207,16 @@ void launchTest(void) {
     NSLog(@"Bytes per frame: %d\n", audioStreamBasicDescription.mBytesPerFrame);
     NSLog(@"Channels per frame: %d\n", audioStreamBasicDescription.mChannelsPerFrame);
     NSLog(@"Bits per channel: %d\n", audioStreamBasicDescription.mBitsPerChannel);
-
+    
+    // Get markers property to see if it can be read by CoreAudio
+    UInt32 propSize;
+    UInt32 writable;
+    OSStatus markerErr = AudioFileGetPropertyInfo(playbackCallbackData.playbackFile,
+                                                  kAudioFilePropertyMarkerList,
+                                                  &propSize,
+                                                  &writable);
+    NSLog(@"Get 'kAudioFilePropertyMarkerList' property error: %d", markerErr);
+    
     // Create an AudioQueue
     AudioQueueRef queue;
     CheckError(AudioQueueNewOutput(&audioStreamBasicDescription,
